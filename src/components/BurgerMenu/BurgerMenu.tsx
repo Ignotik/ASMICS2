@@ -37,7 +37,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ setIsOpen }) => {
       <div className="flex flex-col gap-4 w-full">
         {menuItems.map((item, index) => (
           <Link
-            to={"/" + item.path.toLowerCase()}
+            to={`${item.path}`}
             onClick={() => setIsOpen(false)}
             className="flex nav items-center gap-2"
           >
