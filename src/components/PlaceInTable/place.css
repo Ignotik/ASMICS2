@@ -1,0 +1,10 @@
+.place{
+    background-color:#3d3463;
+}
+.place-inner{
+    background-color: #615c87;
+}
+
+.place-inner:hover{
+    background-color:#3d3463;
+}
