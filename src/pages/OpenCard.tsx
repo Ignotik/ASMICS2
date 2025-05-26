@@ -186,12 +186,12 @@ const OpenPackPage: React.FC = () => {
                     className="w-[130px] rounded-t-xl"
                   />
                 </div>
-                <p className="text-[12px] font-bold mx-2 mt-2">{card.name}</p>
+                <p className="text-[10px] font-bold mx-2 mt-2">{card.name}</p>
                 <div className="flex flex-wrap">
                   {card.description.map((desc) => (
                     <p
                       key={desc}
-                      className="text-[10px] text-purple-500 font-bold m-2"
+                      className="text-[8px] text-purple-500 font-bold m-2"
                     >
                       {desc}
                     </p>
