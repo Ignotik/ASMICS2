@@ -9,14 +9,6 @@ interface CardPackProps {
   description: string;
 }
 
-interface Card {
-  id: number;
-  image: string;
-  name: string;
-  rarity: string;
-  weight: number;
-}
-
 const CardPack: React.FC<CardPackProps> = ({
   id,
   name,
