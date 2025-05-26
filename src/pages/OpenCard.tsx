@@ -8,6 +8,7 @@ interface Card {
   name: string;
   rarity: string;
   weight: number;
+  description: string[];
 }
 
 const OpenPackPage: React.FC = () => {
@@ -24,6 +25,7 @@ const OpenPackPage: React.FC = () => {
     {
       id: 1,
       image: "/card3.png",
+      description: ["MVP BLAST Pro Series Miami 2019"],
       name: "Редкая карта 1",
       rarity: "rare1",
       weight: 10,
@@ -33,11 +35,13 @@ const OpenPackPage: React.FC = () => {
       image: "/card2.png",
       name: "Обычная карта",
       rarity: "common1",
+      description: ["MVP BLAST Pro Series Miami 2019"],
       weight: 20,
     },
     {
       id: 3,
       image: "/card3.png",
+      description: ["MVP BLAST Pro Series Miami 2019"],
       name: "Эпическая карта",
       rarity: "epic",
       weight: 10,
@@ -45,7 +49,8 @@ const OpenPackPage: React.FC = () => {
     {
       id: 4,
       image: Niko,
-      name: "Niko 2019 - Blast Fall Final",
+      name: "Niko 2019 - BLAST Pro Series Miami 2019",
+      description: ["MVP", "1.44 rating 2.0"],
       rarity: "legendary",
       weight: 60,
     },
@@ -54,16 +59,20 @@ const OpenPackPage: React.FC = () => {
       image: "/card5.png",
       name: "Обычная карта 2",
       rarity: "common",
+      description: ["MVP BLAST Pro Series Miami 2019"],
       weight: 20,
     },
     {
       id: 6,
       image: "/card6.png",
+      description: ["MVP BLAST Pro Series Miami 2019"],
       name: "Редкая карта 2",
       rarity: "rare",
       weight: 10,
     },
   ];
+
+  console.log(caseCards[3].description);
 
   const getRandomCard = (): Card => {
     const totalWeight = caseCards.reduce((sum, card) => sum + card.weight, 0);
@@ -91,7 +100,7 @@ const OpenPackPage: React.FC = () => {
     const spinDuration = 4000;
     const startTime = Date.now();
     const startPosition = 0;
-    const cardWidth = 160;
+    const cardWidth = 140;
     const cardMargin = 16;
     const totalCardWidth = cardWidth + cardMargin;
     const wonCard = getRandomCard();
@@ -168,16 +177,26 @@ const OpenPackPage: React.FC = () => {
             {displayCards.map((card, index) => (
               <div
                 key={`${card.id}-${index}`}
-                className="flex-shrink-0 text-center w-[160px] h-[250px] mx-2 bg-gray-700 rounded-lg flex flex-col items-center justify-center"
+                className="flex-shrink-0 text-center w-[140px] h-[250px] mx-2 bg-gray-700 rounded-lg flex flex-col items-center justify-center"
               >
                 <div className=" flex justify-center overflow-hidden">
                   <img
                     src={card.image}
                     alt={card.name}
-                    className="w-[160px] rounded-t-xl"
+                    className="w-[140px] rounded-t-xl"
                   />
                 </div>
-                <p className="text-lg font-bold m-2">{card.name}</p>
+                <p className="text-[14px] font-bold mx-2 mt-2">{card.name}</p>
+                <div className="flex flex-wrap">
+                  {card.description.map((desc) => (
+                    <p
+                      key={desc}
+                      className="text-[10px] text-purple-500 font-bold m-2"
+                    >
+                      {desc}
+                    </p>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -188,12 +207,12 @@ const OpenPackPage: React.FC = () => {
       {wonCard && (
         <div className="mb-8 text-center">
           <h2 className="text-xl font-bold mb-4">Вы выиграли:</h2>
-          <div className="w-[160px] h-[250px] bg-gradient-to-br from-purple-600 to-blue-500 rounded-xl flex flex-col items-center justify-center mx-auto">
+          <div className="w-[140px] h-[250px] bg-gradient-to-br from-purple-600 to-blue-500 rounded-xl flex flex-col items-center justify-center mx-auto">
             <div className=" flex justify-center overflow-hidden">
               <img
                 src={wonCard.image}
                 alt={wonCard.name}
-                className="w-[160px] rounded-t-xl"
+                className="w-[140px] rounded-t-xl"
               />
             </div>
             <p className="text-lg font-bold m-2">{wonCard.name}</p>
