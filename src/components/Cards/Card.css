@@ -1,0 +1,278 @@
+/* Основные стили карточки кейса */
+.card {
+    border: 2px solid #f38c05;
+    background: linear-gradient(135deg, #2a2a3a 0%, #1e1e2a 100%);
+    color: white;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 177px;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(243, 140, 5, 0.3);
+  }
+  
+  .card h1 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .card img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+  }
+  
+  .card p {
+    font-size: 0.875rem;
+    margin: 0;
+  }
+  
+  /* Стили кнопки */
+  .card-btn {
+    background-color: #3d3463;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  
+  .card-btn:hover {
+    background-color: #4d3f7a;
+  }
+  
+  .card-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .card-text {
+    text-decoration: underline;
+    color: #f38c05;
+  }
+  
+  /* Основные стили страницы открытия кейса */
+.pack-opening-page {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    color: white;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Контейнер анимации */
+  .case-opening-animation {
+    width: 100%;
+    height: 220px;
+    position: relative;
+    margin: 2rem auto;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 2px solid #f38c05;
+    overflow: hidden;
+  }
+  
+  /* Видимая область карт (маска) */
+  .cards-viewport {
+    position: relative;
+    display: flex;
+    overflow: hidden;
+  }
+  
+  /* Дорожка с картами */
+  .cards-scroll-track {
+    display: flex;
+    position: absolute;
+    height: 100%;
+    will-change: transform;
+    align-items: center;
+    padding: 0 50%;
+  }
+  
+  /* Стили карточки */
+  .case-card {
+    width: 120px;
+    height: 160px;
+    flex-shrink: 0;
+    margin: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 2px solid transparent;
+  }
+  
+  .case-card img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7));
+  }
+  
+  /* Стили редкостей карт */
+  .rare1 { 
+    border-color: #3498db;
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+  }
+  
+  .common1 { 
+    border-color: #2ecc71;
+  }
+  
+  .epic { 
+    border-color: #9b59b6;
+    box-shadow: 0 0 20px rgba(155, 89, 182, 0.7);
+  }
+  
+  .legendary { 
+    border-color: #f1c40f;
+    box-shadow: 0 0 25px rgba(241, 196, 15, 0.8);
+  }
+  
+  .common { 
+    border-color: #2ecc71;
+  }
+  
+  .rare { 
+    border-color: #3498db;
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+  }
+  
+  /* Стиль выигранной карты */
+  .won {
+    animation: highlight 0.5s ease-in-out 3 alternate;
+    box-shadow: 0 0 30px gold !important;
+    transform: scale(1.1);
+    z-index: 10;
+  }
+  
+  @keyframes highlight {
+    from { transform: scale(1); }
+    to { transform: scale(1.15); }
+  }
+  
+  /* Индикатор выигрыша */
+  .won-indicator {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: gold;
+    font-size: 30px;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7));
+  }
+  
+  /* Оверлей с результатом */
+  .won-card-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .won-card-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    position: relative;
+    max-width: 90%;
+    width: 320px;
+    border: 2px solid gold;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+    overflow: hidden;
+  }
+  
+  /* Эффект блеска */
+  .shine-effect {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0) 45%,
+      rgba(255, 255, 255, 0.8) 50%,
+      rgba(255, 255, 255, 0) 55%
+    );
+    transform: rotate(30deg);
+    animation: shine 3s infinite;
+    pointer-events: none;
+  }
+  
+  .won-card-image {
+    width: 200px;
+    height: 280px;
+    object-fit: contain;
+    margin: 1rem auto;
+    border: 2px solid gold;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    animation: pulse 1.5s infinite alternate;
+  }
+  
+  /* Анимации */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes shine {
+    0% { transform: rotate(30deg) translate(-30%, -30%); }
+    100% { transform: rotate(30deg) translate(30%, 30%); }
+  }
+  
+  @keyframes pulse {
+    from { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+    to { transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
+  }
+  
+  /* Кнопка закрытия */
+  .won-card-content button {
+    margin-top: 1.5rem;
+    background: linear-gradient(to right, #f38c05, #ff6b00);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(243, 140, 5, 0.4);
+  }
+  
+  .won-card-content button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(243, 140, 5, 0.6);
+  }
+  
+  .won-card-content button:active {
+    transform: translateY(0);
+  }

@@ -1,4 +1,6 @@
+import Cards from "../pages/Cards";
 import Main from "../pages/Main";
+import OpenPackPage from "../pages/OpenCard";
 import Stavki from "../pages/Stavki";
 
 export const routes = [
@@ -21,5 +23,13 @@ export const routes = [
   {
     path: "/faq",
     element: <div>FAQ</div>,
+  },
+  {
+    path: "/cards",
+    element: <Cards />,
+  },
+  {
+    path: "/open-pack/:caseId",
+    element: <OpenPackPage />,
   },
 ];

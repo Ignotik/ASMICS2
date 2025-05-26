@@ -10,7 +10,7 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="p-2 fixed top-0 m-2.5 left-0 right-0 header rounded-xl">
+      <header className="p-2 fixed top-0 z-10 m-2.5 left-0 right-0 header rounded-xl">
         <section className="flex justify-between items-center">
           <article
             onClick={() => setIsOpen(!isOpen)}
