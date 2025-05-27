@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Niko from "../assets/Niko.jpg";
+import common from "../assets/COMMON.jpg";
+import rare from "../assets/RARE.jpg";
+import uncommon from "../assets/UNCOMMON.jpg";
+import shiny from "../assets/Shiny.png";
 
 interface Card {
   id: number;
@@ -24,7 +28,7 @@ const OpenPackPage: React.FC = () => {
   const caseCards: Card[] = [
     {
       id: 1,
-      image: "/card3.png",
+      image: rare,
       description: ["MVP BLAST Pro Series Miami 2019"],
       name: "Редкая карта 1",
       rarity: "rare1",
@@ -32,7 +36,7 @@ const OpenPackPage: React.FC = () => {
     },
     {
       id: 2,
-      image: "/card2.png",
+      image: common,
       name: "Обычная карта",
       rarity: "common1",
       description: ["MVP BLAST Pro Series Miami 2019"],
@@ -40,7 +44,7 @@ const OpenPackPage: React.FC = () => {
     },
     {
       id: 3,
-      image: "/card3.png",
+      image: shiny,
       description: ["MVP BLAST Pro Series Miami 2019"],
       name: "Эпическая карта",
       rarity: "epic",
@@ -49,22 +53,22 @@ const OpenPackPage: React.FC = () => {
     {
       id: 4,
       image: Niko,
-      name: "Niko 2019 - BLAST Pro Series Miami 2019",
+      name: "Легендарная карта",
       description: ["MVP", "1.44 rating 2.0"],
       rarity: "legendary",
       weight: 60,
     },
     {
       id: 5,
-      image: "/card5.png",
-      name: "Обычная карта 2",
+      image: uncommon,
+      name: "Необычная карта",
       rarity: "common",
       description: ["MVP BLAST Pro Series Miami 2019"],
       weight: 20,
     },
     {
       id: 6,
-      image: "/card6.png",
+      image: rare,
       description: ["MVP BLAST Pro Series Miami 2019"],
       name: "Редкая карта 2",
       rarity: "rare",
@@ -100,7 +104,7 @@ const OpenPackPage: React.FC = () => {
     const spinDuration = 4000;
     const startTime = Date.now();
     const startPosition = 0;
-    const cardWidth = 130;
+    const cardWidth = 140;
     const cardMargin = 16;
     const totalCardWidth = cardWidth + cardMargin;
     const wonCard = getRandomCard();
@@ -177,26 +181,16 @@ const OpenPackPage: React.FC = () => {
             {displayCards.map((card, index) => (
               <div
                 key={`${card.id}-${index}`}
-                className="flex-shrink-0 text-center w-[130px] h-[250px] mx-2 bg-gray-700 rounded-lg flex flex-col items-center justify-center"
+                className="flex-shrink-0 text-center w-[140px] h-[250px] mx-2 bg-gray-700 rounded-lg flex flex-col items-center justify-center"
               >
                 <div className=" flex justify-center overflow-hidden">
                   <img
                     src={card.image}
                     alt={card.name}
-                    className="w-[130px] rounded-t-xl"
+                    className="w-[140px] rounded-t-xl"
                   />
                 </div>
-                <p className="text-[10px] font-bold mx-2 mt-2">{card.name}</p>
-                <div className="flex flex-wrap">
-                  {card.description.map((desc) => (
-                    <p
-                      key={desc}
-                      className="text-[8px] text-purple-500 font-bold m-2"
-                    >
-                      {desc}
-                    </p>
-                  ))}
-                </div>
+                <p className="text-[12px] font-bold mx-2 mt-2">{card.name}</p>
               </div>
             ))}
           </div>
