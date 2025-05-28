@@ -25,7 +25,7 @@ const OpenPackPage: React.FC = () => {
   const fetchRandomCard = async (): Promise<Card> => {
     try {
       const response = await axios.get<Card>(
-        "http://localhost:8000/get-random-card"
+        "https://crazy-raymond-parallel-marvel.trycloudflare.com/get-random-card"
       );
       return response.data;
     } catch (error) {
@@ -45,7 +45,7 @@ const OpenPackPage: React.FC = () => {
   const fetchAllCards = async (): Promise<Card[]> => {
     try {
       const response = await axios.get<Card[]>(
-        "http://localhost:8000/get-all-cards"
+        "https://crazy-raymond-parallel-marvel.trycloudflare.com/get-all-cards"
       );
       return response.data;
     } catch (error) {
@@ -148,7 +148,7 @@ const OpenPackPage: React.FC = () => {
               >
                 <div className=" flex justify-center overflow-hidden">
                   <img
-                    src={`http://0.0.0.0:8000${card.image}`}
+                    src={`https://crazy-raymond-parallel-marvel.trycloudflare.com${card.image}`}
                     alt={card.name}
                     className="w-[140px] rounded-t-xl"
                   />
