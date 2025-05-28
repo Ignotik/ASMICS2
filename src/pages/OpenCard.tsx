@@ -23,7 +23,7 @@ const OpenPackPage: React.FC = () => {
 
   const fetchRandomCard = async (): Promise<Card> => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/get-random-card");
+      const response = await fetch("http://0.0.0.0:8000/get-random-card");
       if (!response.ok) throw new Error("Failed to fetch card");
       return await response.json();
     } catch (error) {
@@ -42,7 +42,7 @@ const OpenPackPage: React.FC = () => {
 
   const fetchAllCards = async (): Promise<Card[]> => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/get-all-cards");
+      const response = await fetch("http://0.0.0.0:8000 /get-all-cards");
       if (!response.ok) throw new Error("Failed to fetch cards");
       return await response.json();
     } catch (error) {
@@ -145,7 +145,7 @@ const OpenPackPage: React.FC = () => {
               >
                 <div className=" flex justify-center overflow-hidden">
                   <img
-                    src={`http://127.0.0.1:8000${card.image}`}
+                    src={`http://0.0.0.0:8000${card.image}`}
                     alt={card.name}
                     className="w-[140px] rounded-t-xl"
                   />
