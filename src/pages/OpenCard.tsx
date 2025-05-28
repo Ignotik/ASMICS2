@@ -42,7 +42,7 @@ const OpenPackPage: React.FC = () => {
 
   const fetchAllCards = async (): Promise<Card[]> => {
     try {
-      const response = await fetch("http://0.0.0.0:8000 /get-all-cards");
+      const response = await fetch("http://0.0.0.0:8000/get-all-cards");
       if (!response.ok) throw new Error("Failed to fetch cards");
       return await response.json();
     } catch (error) {
