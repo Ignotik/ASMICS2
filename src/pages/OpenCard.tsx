@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import common from "../assets/COMMON.jpg";
+import axios from "axios";
 
 interface Card {
   id: number;
@@ -23,9 +24,10 @@ const OpenPackPage: React.FC = () => {
 
   const fetchRandomCard = async (): Promise<Card> => {
     try {
-      const response = await fetch("http://0.0.0.0:8000/get-random-card");
-      if (!response.ok) throw new Error("Failed to fetch card");
-      return await response.json();
+      const response = await axios.get<Card>(
+        "http://localhost:8000/get-random-card"
+      );
+      return response.data;
     } catch (error) {
       console.error("Error fetching random card:", error);
       // Fallback карта если бэкенд недоступен
@@ -42,9 +44,10 @@ const OpenPackPage: React.FC = () => {
 
   const fetchAllCards = async (): Promise<Card[]> => {
     try {
-      const response = await fetch("http://0.0.0.0:8000/get-all-cards");
-      if (!response.ok) throw new Error("Failed to fetch cards");
-      return await response.json();
+      const response = await axios.get<Card[]>(
+        "http://localhost:8000/get-all-cards"
+      );
+      return response.data;
     } catch (error) {
       console.error("Error fetching all cards:", error);
       return []; // Возвращаем пустой массив в случае ошибки
