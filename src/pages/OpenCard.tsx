@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Niko from "../assets/Niko.jpg";
 import common from "../assets/COMMON.jpg";
-import rare from "../assets/RARE.jpg";
-import uncommon from "../assets/UNCOMMON.jpg";
-import shiny from "../assets/Shiny.png";
 
 interface Card {
   id: number;
@@ -25,80 +21,45 @@ const OpenPackPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
-  const caseCards: Card[] = [
-    {
-      id: 1,
-      image: rare,
-      description: ["MVP BLAST Pro Series Miami 2019"],
-      name: "Редкая карта 1",
-      rarity: "rare1",
-      weight: 10,
-    },
-    {
-      id: 2,
-      image: common,
-      name: "Обычная карта",
-      rarity: "common1",
-      description: ["MVP BLAST Pro Series Miami 2019"],
-      weight: 20,
-    },
-    {
-      id: 3,
-      image: shiny,
-      description: ["MVP BLAST Pro Series Miami 2019"],
-      name: "Эпическая карта",
-      rarity: "epic",
-      weight: 10,
-    },
-    {
-      id: 4,
-      image: Niko,
-      name: "Легендарная карта",
-      description: ["MVP", "1.44 rating 2.0"],
-      rarity: "legendary",
-      weight: 60,
-    },
-    {
-      id: 5,
-      image: uncommon,
-      name: "Необычная карта",
-      rarity: "common",
-      description: ["MVP BLAST Pro Series Miami 2019"],
-      weight: 20,
-    },
-    {
-      id: 6,
-      image: rare,
-      description: ["MVP BLAST Pro Series Miami 2019"],
-      name: "Редкая карта 2",
-      rarity: "rare",
-      weight: 10,
-    },
-  ];
-
-  console.log(caseCards[3].description);
-
-  const getRandomCard = (): Card => {
-    const totalWeight = caseCards.reduce((sum, card) => sum + card.weight, 0);
-    let random = Math.random() * totalWeight;
-
-    for (const card of caseCards) {
-      if (random < card.weight) {
-        return card;
-      }
-      random -= card.weight;
+  const fetchRandomCard = async (): Promise<Card> => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/get-random-card");
+      if (!response.ok) throw new Error("Failed to fetch card");
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching random card:", error);
+      // Fallback карта если бэкенд недоступен
+      return {
+        id: 0,
+        image: common,
+        name: "Обычная карта (fallback)",
+        rarity: "common",
+        description: ["Default description"],
+        weight: 20,
+      };
     }
-
-    return caseCards[0];
   };
 
-  const startSpin = () => {
+  const fetchAllCards = async (): Promise<Card[]> => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/get-all-cards");
+      if (!response.ok) throw new Error("Failed to fetch cards");
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching all cards:", error);
+      return []; // Возвращаем пустой массив в случае ошибки
+    }
+  };
+
+  const startSpin = async () => {
     if (isSpinning) return;
 
     setIsSpinning(true);
     setWonCard(null);
 
-    const repeatedCards = Array(10).fill(caseCards).flat();
+    // Получаем все карты с бэкенда для отображения в рулетке
+    const allCards = await fetchAllCards();
+    const repeatedCards = Array(10).fill(allCards).flat();
     setDisplayCards(repeatedCards);
 
     const spinDuration = 4000;
@@ -107,7 +68,7 @@ const OpenPackPage: React.FC = () => {
     const cardWidth = 140;
     const cardMargin = 16;
     const totalCardWidth = cardWidth + cardMargin;
-    const wonCard = getRandomCard();
+    const wonCard = await fetchRandomCard();
 
     setTimeout(() => {
       if (!containerRef.current || !cardsContainerRef.current) return;
@@ -160,7 +121,6 @@ const OpenPackPage: React.FC = () => {
   const handleBackClick = () => {
     navigate(-1);
   };
-
   return (
     <div className="min-h-screen  text-white p-4 flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-8">Открытие кейса</h1>
@@ -185,7 +145,7 @@ const OpenPackPage: React.FC = () => {
               >
                 <div className=" flex justify-center overflow-hidden">
                   <img
-                    src={card.image}
+                    src={`http://127.0.0.1:8000${card.image}`}
                     alt={card.name}
                     className="w-[140px] rounded-t-xl"
                   />
