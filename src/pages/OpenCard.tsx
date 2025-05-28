@@ -20,6 +20,7 @@ const OpenPackPage: React.FC = () => {
   const [displayCards, setDisplayCards] = useState<Card[]>([]);
   const [scrollPosition, setScrollPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [Isloading, setIsLoading] = useState(false);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   const fetchRandomCard = async (): Promise<Card> => {
@@ -124,6 +125,32 @@ const OpenPackPage: React.FC = () => {
   const handleBackClick = () => {
     navigate(-1);
   };
+
+  const CardItem = React.memo(({ card }: { card: Card }) => (
+    <div className="flex-shrink-0 text-center w-[140px] h-[250px] mx-2 bg-gray-700 rounded-lg flex flex-col items-center justify-center">
+      <div className="flex justify-center overflow-hidden">
+        <img
+          src={`https://crazy-raymond-parallel-marvel.trycloudflare.com${card.image}`}
+          alt={card.name}
+          className="w-[140px] rounded-t-xl"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <p className="text-[12px] font-bold mx-2 mt-2">{card.name}</p>
+    </div>
+  ));
+
+  useEffect(() => {
+    if (displayCards.length > 0) {
+      const imageLoader = new Image();
+      displayCards.forEach((card) => {
+        imageLoader.src = `https://crazy-raymond-parallel-marvel.trycloudflare.com${card.image}`;
+      });
+      setIsLoading(false);
+    }
+  }, [displayCards]);
+
   return (
     <div className="min-h-screen  text-white p-4 flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-8">Открытие кейса</h1>
@@ -142,19 +169,7 @@ const OpenPackPage: React.FC = () => {
             style={{ transform: `translateX(-${scrollPosition}px)` }}
           >
             {displayCards.map((card, index) => (
-              <div
-                key={`${card.id}-${index}`}
-                className="flex-shrink-0 text-center w-[140px] h-[250px] mx-2 bg-gray-700 rounded-lg flex flex-col items-center justify-center"
-              >
-                <div className=" flex justify-center overflow-hidden">
-                  <img
-                    src={`https://crazy-raymond-parallel-marvel.trycloudflare.com${card.image}`}
-                    alt={card.name}
-                    className="w-[140px] rounded-t-xl"
-                  />
-                </div>
-                <p className="text-[12px] font-bold mx-2 mt-2">{card.name}</p>
-              </div>
+              <CardItem key={`${card.id}-${index}`} card={card} />
             ))}
           </div>
         </div>
