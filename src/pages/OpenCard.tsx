@@ -148,7 +148,7 @@ const OpenPackPage: React.FC = () => {
               >
                 <div className=" flex justify-center overflow-hidden">
                   <img
-                    src={`http://0.0.0.0:8000${card.image}`}
+                    src={`http://0.0.0.0:8000/app${card.image}`}
                     alt={card.name}
                     className="w-[140px] rounded-t-xl"
                   />
