@@ -20,7 +20,7 @@ const OpenPackPage: React.FC = () => {
   const [displayCards, setDisplayCards] = useState<Card[]>([]);
   const [scrollPosition, setScrollPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [Isloading, setIsLoading] = useState(false);
+  const [, setIsLoading] = useState(false);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   const fetchRandomCard = async (): Promise<Card> => {
