@@ -1,16 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import common from "../assets/COMMON.jpg";
-import axios from "axios";
-
-interface Card {
-  id: number;
-  image: string;
-  name: string;
-  rarity: string;
-  weight: number;
-  description: string[];
-}
+import { useCardsStore, type Card } from "../utils/store/CardStore";
 
 const OpenPackPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,109 +8,97 @@ const OpenPackPage: React.FC = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [wonCard, setWonCard] = useState<Card | null>(null);
   const [displayCards, setDisplayCards] = useState<Card[]>([]);
-  const [scrollPosition, setScrollPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [, setIsLoading] = useState(false);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number>(0);
 
-  const fetchRandomCard = async (): Promise<Card> => {
-    try {
-      const response = await axios.get<Card>(
-        "https://protecting-crimes-shore-managed.trycloudflare.com/get-random-card"
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching random card:", error);
-      // Fallback карта если бэкенд недоступен
-      return {
-        id: 0,
-        image: common,
-        name: "Обычная карта (fallback)",
-        rarity: "common",
-        description: ["Default description"],
-        weight: 20,
-      };
-    }
-  };
+  // Получаем данные из store
+  const { cards, fetchAllCards, fetchRandomCard } = useCardsStore();
 
-  const fetchAllCards = async (): Promise<Card[]> => {
-    try {
-      const response = await axios.get<Card[]>(
-        "https://protecting-crimes-shore-managed.trycloudflare.com/get-all-cards"
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching all cards:", error);
-      return []; // Возвращаем пустой массив в случае ошибки
-    }
+  const preloadImages = (cards: Card[]) => {
+    cards.forEach((card) => {
+      const img = new Image();
+      img.src = `https://protecting-crimes-shore-managed.trycloudflare.com${card.image}`;
+    });
   };
 
   const startSpin = async () => {
-    if (isSpinning) return;
+    if (isSpinning || cards.length === 0) return;
 
     setIsSpinning(true);
     setWonCard(null);
 
-    // Получаем все карты с бэкенда для отображения в рулетке
-    const allCards = await fetchAllCards();
-    const repeatedCards = Array(10).fill(allCards).flat();
+    const repeatedCards = Array(10).fill(cards).flat();
     setDisplayCards(repeatedCards);
+    preloadImages(repeatedCards);
 
-    const spinDuration = 4000;
-    const startTime = Date.now();
-    const startPosition = 0;
+    // Даем время для рендера карт перед анимацией
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const wonCard = await fetchRandomCard();
     const cardWidth = 140;
     const cardMargin = 16;
     const totalCardWidth = cardWidth + cardMargin;
-    const wonCard = await fetchRandomCard();
 
-    setTimeout(() => {
-      if (!containerRef.current || !cardsContainerRef.current) return;
+    if (!containerRef.current || !cardsContainerRef.current) return;
 
-      const containerWidth = containerRef.current.clientWidth;
-      const cardsContainerWidth = cardsContainerRef.current.scrollWidth;
+    const containerWidth = containerRef.current.clientWidth;
+    const cardsContainerWidth = cardsContainerRef.current.scrollWidth;
 
-      const wonCardPositions: number[] = [];
-      repeatedCards.forEach((card, index) => {
-        if (card.id === wonCard.id) {
-          wonCardPositions.push(index * totalCardWidth);
+    // Находим все позиции выигрышной карты
+    const wonCardPositions: number[] = [];
+    repeatedCards.forEach((card, index) => {
+      if (card.id === wonCard.id) {
+        wonCardPositions.push(index * totalCardWidth);
+      }
+    });
+
+    // Выбираем позицию ближе к середине для остановки
+    const middlePosition = Math.floor(wonCardPositions.length / 2);
+    const targetCardPosition = wonCardPositions[middlePosition];
+    const targetPosition =
+      targetCardPosition - (containerWidth / 2 - cardWidth / 2);
+    const maxPosition = cardsContainerWidth - containerWidth;
+    const finalTargetPosition = Math.min(targetPosition, maxPosition);
+
+    // Добавляем CSS класс для анимации
+    if (cardsContainerRef.current) {
+      cardsContainerRef.current.style.transition = "none";
+      cardsContainerRef.current.style.transform = "translateX(0)";
+
+      // Запускаем анимацию
+      requestAnimationFrame(() => {
+        if (cardsContainerRef.current) {
+          cardsContainerRef.current.style.transition =
+            "transform 4s cubic-bezier(0.2, 0.8, 0.4, 1)";
+          cardsContainerRef.current.style.transform = `translateX(-${finalTargetPosition}px)`;
         }
       });
+    }
 
-      const middlePosition = Math.floor(wonCardPositions.length / 2);
-      const targetCardPosition = wonCardPositions[middlePosition];
-      const targetPosition =
-        targetCardPosition - (containerWidth / 2 - cardWidth / 2);
-      const maxPosition = cardsContainerWidth - containerWidth;
-      const finalTargetPosition = Math.min(targetPosition, maxPosition);
-
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / spinDuration, 1);
-
-        const easing = (t: number) =>
-          t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-        if (progress < 1) {
-          const currentPosition =
-            startPosition +
-            (finalTargetPosition - startPosition) * easing(progress);
-          setScrollPosition(currentPosition);
-          requestAnimationFrame(animate);
-        } else {
-          setScrollPosition(finalTargetPosition);
-          setIsSpinning(false);
-          setWonCard(wonCard);
-        }
-      };
-
-      animate();
-    }, 50);
+    // Устанавливаем таймер для завершения анимации
+    setTimeout(() => {
+      setIsSpinning(false);
+      setWonCard(wonCard);
+    }, 4000);
   };
 
   useEffect(() => {
-    startSpin();
-  }, [id]);
+    // Загружаем карты при монтировании компонента, если они еще не загружены
+    if (cards.length === 0) {
+      fetchAllCards().then(() => {
+        startSpin();
+      });
+    } else {
+      startSpin();
+    }
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [id, cards.length]);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -141,33 +119,19 @@ const OpenPackPage: React.FC = () => {
     </div>
   ));
 
-  useEffect(() => {
-    if (displayCards.length > 0) {
-      const imageLoader = new Image();
-      displayCards.forEach((card) => {
-        imageLoader.src = `https://crazy-raymond-parallel-marvel.trycloudflare.com${card.image}`;
-      });
-      setIsLoading(false);
-    }
-  }, [displayCards]);
-
   return (
-    <div className="min-h-screen  text-white p-4 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-8">Открытие кейса</h1>
+    <div className="min-h-screen text-white p-4 flex flex-col items-center">
+      <h1 className="text-2xl font-bold mb-4">Открытие кейса</h1>
 
-      <div className="w-full max-w-4xl mb-8" ref={containerRef}>
+      <div className="w-full max-w-4xl mb-4" ref={containerRef}>
         {/* Указатель центра */}
-        <div className="flex justify-center mb-2">
-          <div className="text-red-500 text-4xl">▼</div>
+        <div className="flex justify-center mb-1">
+          <div className="text-red-500 text-3xl">▼</div>
         </div>
 
         {/* Область рулетки */}
-        <div className="relative p-5 h-72 overflow-hidden border-2 border-gray-700 rounded-lg bg-gray-800">
-          <div
-            ref={cardsContainerRef}
-            className="flex transition-transform duration-100"
-            style={{ transform: `translateX(-${scrollPosition}px)` }}
-          >
+        <div className="relative p-2 overflow-hidden border-2 border-gray-700 rounded-lg bg-gray-800">
+          <div ref={cardsContainerRef} className="flex will-change-transform">
             {displayCards.map((card, index) => (
               <CardItem key={`${card.id}-${index}`} card={card} />
             ))}
@@ -177,17 +141,17 @@ const OpenPackPage: React.FC = () => {
 
       {/* Выигранная карта */}
       {wonCard && (
-        <div className="mb-8 text-center">
-          <h2 className="text-xl font-bold mb-4">Вы выиграли:</h2>
-          <div className="w-[140px] h-[250px] bg-gradient-to-br from-purple-600 to-blue-500 rounded-xl flex flex-col items-center justify-center mx-auto">
-            <div className=" flex justify-center overflow-hidden">
+        <div className="mb-4 text-center">
+          <h2 className="text-xl font-bold mb-2">Вы выиграли:</h2>
+          <div className="w-[140px] h-[200px] bg-gradient-to-br from-purple-600 to-blue-500 rounded-xl flex flex-col items-center justify-center mx-auto">
+            <div className="flex justify-center overflow-hidden h-[140px] w-full">
               <img
                 src={wonCard.image}
                 alt={wonCard.name}
-                className="w-[140px] rounded-t-xl"
+                className="w-full h-full object-cover rounded-t-xl"
               />
             </div>
-            <p className="text-lg font-bold m-2">{wonCard.name}</p>
+            <p className="text-sm font-bold m-2 line-clamp-2">{wonCard.name}</p>
           </div>
         </div>
       )}
