@@ -119,7 +119,7 @@ const OpenPackPage: React.FC = () => {
 
       {wonCard && (
         <div className="mb-4 text-center">
-          <h2 className="text-xl font-bold mb-2">Вы выиграли:</h2>
+          <h2 className="text-xl font-bold mb-2">Вы выиграли :</h2>
           <div className="w-[140px] h-[200px] bg-gradient-to-br from-purple-600 to-blue-500 rounded-xl flex flex-col items-center justify-center mx-auto">
             <div className="flex justify-center overflow-hidden h-[140px] w-full">
               <img
