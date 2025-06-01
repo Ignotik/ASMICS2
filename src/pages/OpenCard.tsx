@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCardsStore, type Card } from "../utils/store/CardStore";
+import { CardItem } from "../components/Cards/Card";
+import { baseUrl } from "../utils/consts/url-backend";
 
 const OpenPackPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,13 +14,12 @@ const OpenPackPage: React.FC = () => {
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number>(0);
 
-  // Получаем данные из store
   const { cards, fetchAllCards, fetchRandomCard } = useCardsStore();
 
   const preloadImages = (cards: Card[]) => {
     cards.forEach((card) => {
       const img = new Image();
-      img.src = `https://protecting-crimes-shore-managed.trycloudflare.com${card.image}`;
+      img.src = `${baseUrl}${card.image}`;
     });
   };
 
@@ -32,7 +33,6 @@ const OpenPackPage: React.FC = () => {
     setDisplayCards(repeatedCards);
     preloadImages(repeatedCards);
 
-    // Даем время для рендера карт перед анимацией
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     const wonCard = await fetchRandomCard();
@@ -45,7 +45,6 @@ const OpenPackPage: React.FC = () => {
     const containerWidth = containerRef.current.clientWidth;
     const cardsContainerWidth = cardsContainerRef.current.scrollWidth;
 
-    // Находим все позиции выигрышной карты
     const wonCardPositions: number[] = [];
     repeatedCards.forEach((card, index) => {
       if (card.id === wonCard.id) {
@@ -53,7 +52,6 @@ const OpenPackPage: React.FC = () => {
       }
     });
 
-    // Выбираем позицию ближе к середине для остановки
     const middlePosition = Math.floor(wonCardPositions.length / 2);
     const targetCardPosition = wonCardPositions[middlePosition];
     const targetPosition =
@@ -76,7 +74,6 @@ const OpenPackPage: React.FC = () => {
       });
     }
 
-    // Устанавливаем таймер для завершения анимации
     setTimeout(() => {
       setIsSpinning(false);
       setWonCard(wonCard);
@@ -84,7 +81,6 @@ const OpenPackPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Загружаем карты при монтировании компонента, если они еще не загружены
     if (cards.length === 0) {
       fetchAllCards().then(() => {
         startSpin();
@@ -104,32 +100,14 @@ const OpenPackPage: React.FC = () => {
     navigate(-1);
   };
 
-  const CardItem = React.memo(({ card }: { card: Card }) => (
-    <div className="flex-shrink-0 text-center w-[140px] h-[250px] mx-2 bg-gray-700 rounded-lg flex flex-col items-center justify-center">
-      <div className="flex justify-center overflow-hidden">
-        <img
-          src={`https://protecting-crimes-shore-managed.trycloudflare.com${card.image}`}
-          alt={card.name}
-          className="w-[140px] rounded-t-xl"
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-      <p className="text-[12px] font-bold mx-2 mt-2">{card.name}</p>
-    </div>
-  ));
-
   return (
     <div className="min-h-screen text-white p-4 flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-4">Открытие кейса</h1>
 
       <div className="w-full max-w-4xl mb-4" ref={containerRef}>
-        {/* Указатель центра */}
         <div className="flex justify-center mb-1">
           <div className="text-red-500 text-3xl">▼</div>
         </div>
-
-        {/* Область рулетки */}
         <div className="relative p-2 overflow-hidden border-2 border-gray-700 rounded-lg bg-gray-800">
           <div ref={cardsContainerRef} className="flex will-change-transform">
             {displayCards.map((card, index) => (
@@ -139,7 +117,6 @@ const OpenPackPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Выигранная карта */}
       {wonCard && (
         <div className="mb-4 text-center">
           <h2 className="text-xl font-bold mb-2">Вы выиграли:</h2>
@@ -156,7 +133,6 @@ const OpenPackPage: React.FC = () => {
         </div>
       )}
 
-      {/* Кнопка назад */}
       <button
         onClick={handleBackClick}
         className="mt-4 px-6 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"

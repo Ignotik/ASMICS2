@@ -1,72 +1,16 @@
+import { motion, AnimatePresence } from "framer-motion";
 import React from "react";
 import "./BurgerMenu.css";
 import logo from "../../assets/FEFEFE.png";
-import { LuCrown } from "react-icons/lu";
-import { GiTrophyCup } from "react-icons/gi";
-import { AiOutlineAim } from "react-icons/ai";
-import { CiSettings } from "react-icons/ci";
-import { FaHome } from "react-icons/fa";
+import { menuItems } from "../../utils/consts/burger";
 import { Link } from "react-router-dom";
-import { BsBackpack } from "react-icons/bs";
-import { TbPlayCard } from "react-icons/tb";
 
 interface BurgerMenuProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isOpen: boolean;
 }
 
-const menuItems = [
-  {
-    icon: <FaHome size={30} />,
-    section: "Основное",
-    text: "Главная",
-    path: "/",
-  },
-  {
-    icon: <LuCrown size={30} />,
-    section: "Основное",
-    text: "Мои ставки",
-    path: "/stavki",
-  },
-  {
-    icon: <AiOutlineAim size={30} />,
-    section: "Основное",
-    text: "Статистика",
-    path: "/statistic",
-  },
-  {
-    icon: <GiTrophyCup size={30} />,
-    section: "Основное",
-    text: "Рейтинг",
-    path: "/rating",
-  },
-  {
-    icon: <CiSettings size={30} />,
-    section: "Основное",
-    text: "FAQ",
-    path: "/faq",
-  },
-  {
-    icon: <TbPlayCard size={30} />,
-    section: "Asmi-cards",
-    text: "Магазин карточек",
-    path: "/cards",
-  },
-  {
-    icon: <BsBackpack size={30} />,
-    section: "Asmi-cards",
-    text: "Мои карточки",
-    path: "/my-cards",
-  },
-  {
-    icon: <CiSettings size={30} />,
-    section: "Asmi-cards",
-    text: "FAQ",
-    path: "/faq-cards",
-  },
-];
-
-const BurgerMenu: React.FC<BurgerMenuProps> = ({ setIsOpen }) => {
-  // Группируем элементы по секциям
+const BurgerMenu: React.FC<BurgerMenuProps> = ({ setIsOpen, isOpen }) => {
   const groupedItems = menuItems.reduce((acc, item) => {
     if (!acc[item.section]) {
       acc[item.section] = [];
@@ -75,43 +19,70 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ setIsOpen }) => {
     return acc;
   }, {} as Record<string, typeof menuItems>);
 
-  return (
-    <section className="flex flex-col items-center z-10 absolute top-0 left-0 right-0 bottom-0 p-4 bg-gray-800 burger-menu">
-      <div className="flex items-center justify-between w-full mb-4">
-        <div onClick={() => setIsOpen(false)}>
-          <img src={logo} alt="Logo" className="h-10" />
-        </div>
-        <p
-          className="w-8 h-8 flex items-center justify-center rounded-full border border-white cursor-pointer"
-          onClick={() => setIsOpen(false)}
-        >
-          X
-        </p>
-      </div>
+  const handleClose = () => {
+    setIsOpen(false);
+  };
 
-      <div className="flex flex-col gap-6 w-full overflow-y-auto">
-        {Object.entries(groupedItems).map(([section, items]) => (
-          <div key={section} className="flex flex-col gap-2">
-            <h3 className="text-gray-400 text-sm uppercase font-bold px-2">
-              {section}
-            </h3>
-            <div className="flex flex-col gap-1">
-              {items.map((item, index) => (
-                <Link
-                  key={`${section}-${index}`}
-                  to={item.path}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 p-2 rounded hover:bg-gray-700 transition-colors"
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{
+              type: "tween",
+              ease: [0.25, 0.1, 0.25, 1],
+              duration: 0.3,
+            }}
+            className="fixed inset-0 z-50 bg-gray-800 overflow-hidden"
+          >
+            <div className="container mx-auto h-full flex flex-col p-6">
+              {/* Шапка меню (фиксированная высота) */}
+              <div className="flex items-center justify-between mb-8 h-12">
+                <img src={logo} alt="Logo" className="h-full" />
+                <button
+                  className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-white text-white text-xl hover:bg-gray-700 transition-colors"
+                  onClick={handleClose}
+                  aria-label="Close menu"
                 >
-                  <span className="text-gray-300">{item.icon}</span>
-                  <span className="text-gray-100">{item.text}</span>
-                </Link>
-              ))}
+                  &times;
+                </button>
+              </div>
+
+              {/* Основной контент с прокруткой */}
+              <div className="menu-scroll-container">
+                <div className="grid gap-8">
+                  {Object.entries(groupedItems).map(([section, items]) => (
+                    <div key={section} className="mb-6">
+                      <h3 className="text-gray-400 text-lg uppercase font-bold mb-4 px-2">
+                        {section}
+                      </h3>
+                      <div className="grid gap-2">
+                        {items.map((item, index) => (
+                          <Link
+                            key={`${section}-${index}`}
+                            to={item.path}
+                            onClick={handleClose}
+                            className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-700 transition-colors text-lg"
+                          >
+                            <span className="text-gray-300 text-xl">
+                              {item.icon}
+                            </span>
+                            <span className="text-gray-100">{item.text}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </section>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 

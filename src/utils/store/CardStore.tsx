@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import common from "../../assets/COMMON.jpg";
+import { baseUrl } from "../consts/url-backend";
 
 export interface Card {
   id: number;
@@ -27,9 +28,7 @@ export const useCardsStore = create<CardsStore>((set) => ({
   fetchAllCards: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get<Card[]>(
-        "https://protecting-crimes-shore-managed.trycloudflare.com/get-all-cards"
-      );
+      const response = await axios.get<Card[]>(`${baseUrl}/get-all-cards`);
       set({ cards: response.data, isLoading: false });
     } catch (error) {
       console.error("Error fetching all cards:", error);
@@ -39,9 +38,7 @@ export const useCardsStore = create<CardsStore>((set) => ({
 
   fetchRandomCard: async () => {
     try {
-      const response = await axios.get<Card>(
-        "https://protecting-crimes-shore-managed.trycloudflare.com/get-random-card"
-      );
+      const response = await axios.get<Card>(`${baseUrl}/get-random-card`);
       return response.data;
     } catch (error) {
       console.error("Error fetching random card:", error);

@@ -3,6 +3,8 @@ import { IoIosArrowDown } from "react-icons/io";
 import { LuCrown } from "react-icons/lu";
 import "./tourner.css";
 import axios from "axios";
+import { baseUrl } from "../../utils/consts/url-backend";
+import { motion } from "framer-motion";
 
 interface Odd {
   team1: number | null;
@@ -34,7 +36,7 @@ const Tourner: React.FC = () => {
     try {
       setLoading(true);
       const response = await axios.get<Tournament[]>(
-        `http://127.0.0.1:8000/betboom/?${tournaments
+        `${baseUrl}/betboom/?${tournaments
           .map((t) => `tournaments=${encodeURIComponent(t)}`)
           .join("&")}`
       );
@@ -52,7 +54,10 @@ const Tourner: React.FC = () => {
     // Пример запроса с двумя турнирами
     getTournaments([
       "intel-extreme-masters-dallas-2025",
+      "blast-tv-austin-major-2025-stage-1",
+      "blast-tv-austin-major-2025-stage-2",
       "blast-tv-austin-major-2025",
+      "cct-season-3-european-series-2",
     ]);
   }, []);
 
@@ -64,6 +69,17 @@ const Tourner: React.FC = () => {
     );
   };
 
+  const validTournaments = data.filter(
+    (item): item is Tournament =>
+      item !== null && item.matches && item.matches.length > 0
+  );
+
+  if (validTournaments.length === 0) {
+    return (
+      <div className="text-center text-[20px] font-bold py-4">Загрузка...</div>
+    );
+  }
+
   if (loading) return <div className="text-center py-4">Загрузка...</div>;
   if (error)
     return <div className="text-center py-4 text-red-500">{error}</div>;
@@ -71,7 +87,7 @@ const Tourner: React.FC = () => {
   return (
     <section className="mt-4 flex flex-col gap-4">
       <p className="font-bold text-[20px]">Турниры</p>
-      {data.map((item) => (
+      {validTournaments.map((item) => (
         <div
           key={item.id}
           className="tourner rounded-xl cursor-pointer p-2"
@@ -92,64 +108,118 @@ const Tourner: React.FC = () => {
           </div>
 
           {openTournaments.includes(item.tournament) && (
-            <ul className="flex mt-2 flex-col gap-2">
-              {item.matches.map((match, index) => (
-                <li
-                  key={index}
-                  className="match h-28 flex items-center justify-between p-4 rounded-xl"
-                >
-                  <div className="flex flex-col items-center flex-1">
-                    {match.logo1 ? (
-                      <img
-                        className="w-10 h-10 object-contain"
-                        src={match.logo1}
-                        alt={match.team1}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                    )}
-                    <p className="text-[14px] text-center mt-2">
-                      {match.team1}
-                    </p>
-                    {match.odds.team1 && (
-                      <span className="text-xs text-gray-500 mt-1">
-                        {match.odds.team1.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
+            <motion.div
+              initial={false}
+              animate={{ height: "auto" }}
+              exit={{ height: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <ul className="flex mt-2 flex-col gap-2">
+                {item.matches.map((match, index) => (
+                  <motion.li
+                    key={index}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    className="match h-28 flex items-center justify-between p-4 rounded-xl"
+                  >
+                    <div className="flex flex-col items-center flex-1">
+                      {match.logo1 ? (
+                        <motion.img
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: index * 0.05 + 0.1 }}
+                          className="w-10 h-10 object-contain"
+                          src={match.logo1}
+                          alt={match.team1}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display =
+                              "none";
+                          }}
+                        />
+                      ) : (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: index * 0.05 + 0.1 }}
+                          className="w-10 h-10 bg-gray-200 rounded-full"
+                        />
+                      )}
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: index * 0.05 + 0.15 }}
+                        className="text-[14px] text-center mt-2"
+                      >
+                        {match.team1}
+                      </motion.p>
+                      {match.odds.team1 && (
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: index * 0.05 + 0.2 }}
+                          className="text-xs text-[#10b981] mt-1"
+                        >
+                          {match.odds.team1.toFixed(2)}
+                        </motion.span>
+                      )}
+                    </div>
 
-                  <div className="mx-4 text-center">
-                    <p className="font-medium">{match.time}</p>
-                  </div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: index * 0.05 + 0.25 }}
+                      className="mx-4 text-center"
+                    >
+                      <p className="font-medium">{match.time}</p>
+                    </motion.div>
 
-                  <div className="flex flex-col items-center flex-1">
-                    {match.logo2 ? (
-                      <img
-                        className="w-10 h-10 object-contain"
-                        src={match.logo2}
-                        alt={match.team2}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                    )}
-                    <p className="text-[14px] text-center mt-2">
-                      {match.team2}
-                    </p>
-                    {match.odds.team2 && (
-                      <span className="text-xs text-gray-500 mt-1">
-                        {match.odds.team2.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                    <div className="flex flex-col items-center flex-1">
+                      {match.logo2 ? (
+                        <motion.img
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: index * 0.05 + 0.1 }}
+                          className="w-10 h-10 object-contain"
+                          src={match.logo2}
+                          alt={match.team2}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display =
+                              "none";
+                          }}
+                        />
+                      ) : (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: index * 0.05 + 0.1 }}
+                          className="w-10 h-10 bg-gray-200 rounded-full"
+                        />
+                      )}
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: index * 0.05 + 0.15 }}
+                        className="text-[14px] text-center mt-2"
+                      >
+                        {match.team2}
+                      </motion.p>
+                      {match.odds.team2 && (
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: index * 0.05 + 0.2 }}
+                          className="text-xs text-[#10b981] mt-1"
+                        >
+                          {match.odds.team2.toFixed(2)}
+                        </motion.span>
+                      )}
+                    </div>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
           )}
         </div>
       ))}

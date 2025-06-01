@@ -5,9 +5,9 @@ import { IoIosArrowForward } from "react-icons/io";
 
 const PlaceInTable: React.FC = () => {
   return (
-    <section className="place mt-2 p-4 rounded-xl">
-      <article className="p-2 rounded-xl place-inner flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <section className="place bg-[#10b981] cursor-pointer mt-2 p-4 rounded-xl">
+      <article className="p-2 bg-[#248666] rounded-xl place-inner flex items-center justify-between">
+        <div className="flex  items-center gap-2">
           <GiTrophyCup color="white" size={30} />
           <div className="flex gap-2 flex-col">
             <p>#5543545</p>

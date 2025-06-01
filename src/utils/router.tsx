@@ -1,6 +1,8 @@
+import AllTourner from "../pages/AllTourner";
 import Cards from "../pages/Cards";
 import Main from "../pages/Main";
 import OpenPackPage from "../pages/OpenCard";
+import RatingPage from "../pages/RatingPage";
 import Stavki from "../pages/Stavki";
 
 export const routes = [
@@ -18,7 +20,7 @@ export const routes = [
   },
   {
     path: "/rating",
-    element: <div>Rating</div>,
+    element: <RatingPage />,
   },
   {
     path: "/faq",
@@ -27,6 +29,10 @@ export const routes = [
   {
     path: "/cards",
     element: <Cards />,
+  },
+  {
+    path: "tournaments",
+    element: <AllTourner />,
   },
   {
     path: "/open-pack/:caseId",
