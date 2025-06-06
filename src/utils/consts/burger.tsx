@@ -3,6 +3,7 @@ import { CiSettings } from "react-icons/ci";
 import { FaHome, FaRegQuestionCircle } from "react-icons/fa";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { GiTrophyCup } from "react-icons/gi";
+import { GoGift } from "react-icons/go";
 import { LuCrown } from "react-icons/lu";
 import { TbPlayCard } from "react-icons/tb";
 
@@ -57,39 +58,9 @@ export const menuItems = [
     path: "/settings",
   },
   {
-    icon: <FaRegQuestionCircle size={30} />,
-    section: "Вспомогательное",
-    text: "Поддержка",
-    path: "/support",
-  },
-  {
-    icon: <CiSettings size={30} />,
-    section: "Вспомогательное",
-    text: "Настройки",
-    path: "/settings",
-  },
-  {
-    icon: <FaRegQuestionCircle size={30} />,
-    section: "Вспомогательное",
-    text: "Поддержка",
-    path: "/support",
-  },
-  {
-    icon: <CiSettings size={30} />,
-    section: "Вспомогательное",
-    text: "Настройки",
-    path: "/settings",
-  },
-  {
-    icon: <FaRegQuestionCircle size={30} />,
-    section: "Вспомогательное",
-    text: "Поддержка",
-    path: "/support",
-  },
-  {
-    icon: <CiSettings size={30} />,
-    section: "Вспомогательное",
-    text: "Настройки",
-    path: "/settings",
+    icon: <GoGift size={30} />,
+    section: "Основное",
+    text: "Бонусы",
+    path: "/bonus",
   },
 ];

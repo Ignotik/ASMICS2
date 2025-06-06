@@ -1,4 +1,5 @@
 import AllTourner from "../pages/AllTourner";
+import Bonus from "../pages/Bonus";
 import Cards from "../pages/Cards";
 import Main from "../pages/Main";
 import OpenPackPage from "../pages/OpenCard";
@@ -33,6 +34,10 @@ export const routes = [
   {
     path: "tournaments",
     element: <AllTourner />,
+  },
+  {
+    path: "/bonus",
+    element: <Bonus />,
   },
   {
     path: "/open-pack/:caseId",
