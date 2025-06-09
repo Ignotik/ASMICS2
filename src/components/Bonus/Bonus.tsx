@@ -116,7 +116,7 @@ const BonusComponent: React.FC = () => {
         <h2 className="font-bold text-black">Приветственный бонус</h2>
         <p>
           Получите 10,000 монет в качестве приветственного бонуса! Доступен
-          только один раз.
+          только один раз .
         </p>
         <button></button>
       </article>
