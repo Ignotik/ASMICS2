@@ -95,8 +95,8 @@ export function useTelegram() {
     }
   };
 
-  const userId = tg.initDataUnsafe?.user?.id || 6485315240;
-  const user = tg.initDataUnsafe?.user?.username || "kwed";
+  const userId = tg.initDataUnsafe?.user?.id || 3248324094992;
+  const user = tg.initDataUnsafe?.user?.username || "ваываываываы";
   const name = tg.initDataUnsafe?.user?.first_name || null;
 
   return {
