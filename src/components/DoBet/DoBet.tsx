@@ -1,14 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import DoBetMain from "./DoBetMain";
+import type { Team } from "../Tourners/Tourner";
 
 interface DoBetProps {
   selectedMatch: {
-    team1: string;
-    team2: string;
-    time: string;
-    logo1: string | null;
-    logo2: string | null;
+    team_1: Team;
+    team_2: Team;
   } | null;
   selectedOdd: {
     team: string;

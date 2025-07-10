@@ -98,11 +98,13 @@ export function useTelegram() {
   const userId = tg.initDataUnsafe?.user?.id || 3248324094992;
   const user = tg.initDataUnsafe?.user?.username || "ваываываываы";
   const name = tg.initDataUnsafe?.user?.first_name || null;
+  const initData = tg.initDataUnsafe || "";
 
   return {
     onClose,
     shareToStory,
     tg,
+    initData,
     userId,
     user,
     name,

@@ -1,12 +1,10 @@
 import React from "react";
+import type { Team } from "../Tourners/Tourner";
 
 type DoBetProps = {
   selectedMatch: {
-    team1: string;
-    team2: string;
-    time: string;
-    logo1: string | null;
-    logo2: string | null;
+    team_1: Team;
+    team_2: Team;
   };
   selectedOdd: {
     team: string;
@@ -44,11 +42,11 @@ const DoBetMain: React.FC<DoBetProps> = ({
         {/* Команда 1 */}
         <div className="flex flex-col items-center w-1/3">
           <div className="w-16 h-16 mb-2 flex items-center justify-center">
-            {selectedMatch.logo1 ? (
+            {selectedMatch.team_1.icon_path ? (
               <img
                 className="max-h-full max-w-full object-contain"
-                src={selectedMatch.logo1}
-                alt={selectedMatch.team1}
+                src={selectedMatch.team_1.icon_path}
+                alt={selectedMatch.team_1.name}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
                     "https://via.placeholder.com/64";
@@ -57,32 +55,32 @@ const DoBetMain: React.FC<DoBetProps> = ({
             ) : (
               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
                 <span className="text-xs text-center">
-                  {selectedMatch.team1}
+                  {selectedMatch.team_1.name}
                 </span>
               </div>
             )}
           </div>
           <p className="font-medium text-center text-sm md:text-base">
-            {selectedMatch.team1}
+            {selectedMatch.team_1.name}
           </p>
         </div>
 
         {/* Время матча */}
-        <div className="flex flex-col items-center mx-2 w-1/3">
+        {/* <div className="flex flex-col items-center mx-2 w-1/3">
           <div className="text-xs text-gray-300 mb-1">Матч</div>
           <div className="bg-[#0ea5e9] text-white text-xs px-2 py-1 rounded-md">
             {selectedMatch.time}
           </div>
-        </div>
+        </div> */}
 
         {/* Команда 2 */}
         <div className="flex flex-col items-center w-1/3">
           <div className="w-16 h-16 mb-2 flex items-center justify-center">
-            {selectedMatch.logo2 ? (
+            {selectedMatch.team_2.icon_path ? (
               <img
                 className="max-h-full max-w-full object-contain"
-                src={selectedMatch.logo2}
-                alt={selectedMatch.team2}
+                src={selectedMatch.team_2.icon_path}
+                alt={selectedMatch.team_2.name}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
                     "https://via.placeholder.com/64";
@@ -91,13 +89,13 @@ const DoBetMain: React.FC<DoBetProps> = ({
             ) : (
               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
                 <span className="text-xs text-center">
-                  {selectedMatch.team2}
+                  {selectedMatch.team_2.name}
                 </span>
               </div>
             )}
           </div>
           <p className="font-medium text-center text-sm md:text-base">
-            {selectedMatch.team2}
+            {selectedMatch.team_2.name}
           </p>
         </div>
       </div>
