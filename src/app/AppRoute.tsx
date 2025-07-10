@@ -10,6 +10,7 @@ const AppRoute: React.FC = () => {
 
   useEffect(() => {
     alert("Telegram WebApp data: " + initData);
+    console.log(initData);
   }, [initData]);
 
   return (
