@@ -54,7 +54,7 @@ interface TelegramWebApp {
   ) => Promise<void>;
 }
 
-const tg: TelegramWebApp = (window as any).Telegram?.WebApp || {
+const tg: TelegramWebApp = (window as any).Telegram.WebApp || {
   close: () => {},
   expand: () => {},
   HapticFeedback: {

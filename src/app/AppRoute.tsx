@@ -6,10 +6,11 @@ import { useTelegram } from "../hooks/useTelegramm";
 
 const AppRoute: React.FC = () => {
   const routing = useRoutes(routes);
-  const { initData } = useTelegram();
+  const { initData, user } = useTelegram();
 
   useEffect(() => {
-    alert(initData);
+    console.log(initData);
+    console.log(user);
   }, [initData]);
 
   return (
