@@ -9,7 +9,7 @@ const AppRoute: React.FC = () => {
   const { initData } = useTelegram();
 
   useEffect(() => {
-    console.log(initData);
+    alert(initData);
   }, [initData]);
 
   return (
