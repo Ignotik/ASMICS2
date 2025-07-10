@@ -6,15 +6,11 @@ import { routes } from "../utils/router";
 
 const AppRoute: React.FC = () => {
   const routing = useRoutes(routes);
-  const { initData, isWebAppAvailable } = useTelegram();
+  const { initData } = useTelegram();
 
   useEffect(() => {
-    if (isWebAppAvailable) {
-      console.log("Telegram WebApp data:", initData);
-    } else {
-      console.warn("Приложение запущено вне Telegram");
-    }
-  }, [initData, isWebAppAvailable]);
+    alert("Telegram WebApp data: " + initData);
+  }, [initData]);
 
   return (
     <div className="p-2.5">
