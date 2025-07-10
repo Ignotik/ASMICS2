@@ -1,24 +1,25 @@
-import React, { useEffect } from "react";
-import Layout from "../components/Layout/Layout";
+import { useEffect } from "react";
 import { useRoutes } from "react-router-dom";
-import { routes } from "../utils/router";
+import Layout from "../components/Layout/Layout";
 import { useTelegram } from "../hooks/useTelegramm";
+import { routes } from "../utils/router";
 
 const AppRoute: React.FC = () => {
   const routing = useRoutes(routes);
-  const { initData, user } = useTelegram();
+  const { initData, isWebAppAvailable } = useTelegram();
 
   useEffect(() => {
-    console.log(initData);
-    console.log(user);
-  }, [initData]);
+    if (isWebAppAvailable) {
+      console.log("Telegram WebApp data:", initData);
+    } else {
+      console.warn("Приложение запущено вне Telegram");
+    }
+  }, [initData, isWebAppAvailable]);
 
   return (
-    <>
-      <div className="p-2.5">
-        <Layout>{routing}</Layout>
-      </div>
-    </>
+    <div className="p-2.5">
+      <Layout>{routing}</Layout>
+    </div>
   );
 };
 
