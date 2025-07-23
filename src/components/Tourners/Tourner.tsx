@@ -2,101 +2,36 @@ import React, { useEffect, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { LuCrown } from "react-icons/lu";
 import "./tourner.css";
-import axios from "axios";
 import { baseUrl } from "../../utils/consts/url-backend";
 import { motion, AnimatePresence } from "framer-motion";
 import DoBet from "../DoBet/DoBet";
+import { useMatchStore } from "../../utils/store/MatchStore";
+import { useTournamentStore } from "../../utils/store/TournamentStore";
+import type { Match, Tournament } from "../../utils/types/tournament";
+import { useBetStore } from "../../utils/store/BetStore";
+import { useUserStore } from "../../utils/store/UserStore";
 
-export interface Team {
-  id: number;
-  name: string; // убрали "?" - теперь name обязателен
-  coefficient: number;
-  icon_path?: string | null;
-}
-
-interface Match {
-  id: number;
-  team_1_coefficient: string;
-  team_2_coefficient: string;
-  started_at: string;
-  results_announced_at: string | null;
-  created_at: string;
-  updated_at: string;
-  team_1: Team;
-  team_2: Team;
-  time?: string;
-}
-
-interface Tournament {
-  id: number;
-  name: string;
-  matches: Match[];
-  closed_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
 const Tourner: React.FC = () => {
   const [openTournaments, setOpenTournaments] = useState<string[]>([]);
-  const [data, setData] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [betAmount, setBetAmount] = useState<number>(100);
   const [selectedOdd, setSelectedOdd] = useState<{
-    team: string;
+    team: number;
+    teamName: string;
     value: number;
   } | null>(null);
+  const { user } = useUserStore();
+  const { fetchUser } = useUserStore();
+  const { createBet } = useBetStore();
+  const { matches, fetchMatches } = useMatchStore();
+  const { tournaments, fetchTournaments } = useTournamentStore();
 
-  const getTournaments = async () => {
+  const getData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get<Tournament[]>(`${baseUrl}/tournaments/`);
-
-      console.log("Matches details:");
-      response.data.forEach((tournament, tournamentIndex) => {
-        console.group(`Tournament ${tournamentIndex + 1}: ${tournament.name}`);
-        tournament.matches.forEach((match, matchIndex) => {
-          console.group(`Match ${matchIndex + 1}:`);
-          console.log("Team 1:", {
-            name: match.team_1.name,
-            coefficient: match.team_1_coefficient,
-            icon: match.team_1.icon_path,
-          });
-          console.log("Team 2:", {
-            name: match.team_2.name,
-            coefficient: match.team_2_coefficient,
-            icon: match.team_2.icon_path,
-          });
-          console.log("Time:", new Date(match.started_at).toLocaleString());
-          console.groupEnd();
-        });
-        console.groupEnd();
-      });
-
-      const formattedData = response.data.map((tournament) => ({
-        ...tournament,
-        matches: tournament.matches.map((match) => ({
-          ...match,
-          team1: {
-            id: match.team_1.id,
-            name: match.team_1.name,
-            coefficient: parseFloat(match.team_1_coefficient),
-            logo: match.team_1.icon_path,
-          },
-          team2: {
-            id: match.team_2.id,
-            name: match.team_2.name,
-            coefficient: parseFloat(match.team_2_coefficient),
-            logo: match.team_2.icon_path,
-          },
-          time: new Date(match.started_at).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        })),
-      }));
-
-      setData(formattedData);
+      await Promise.all([fetchMatches(), fetchTournaments()]);
       setError(null);
     } catch (err) {
       setError("Ошибка при загрузке данных");
@@ -107,8 +42,27 @@ const Tourner: React.FC = () => {
   };
 
   useEffect(() => {
-    getTournaments();
+    getData();
   }, []);
+
+  const groupedMatches = tournaments
+    .map((tournament: Tournament) => {
+      const tournamentMatches = matches
+        .filter((match) => match.tournament?.id === tournament.id)
+        .map((match) => ({
+          ...match,
+          time: new Date(match.started_at).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        }));
+
+      return {
+        ...tournament,
+        matches: tournamentMatches,
+      };
+    })
+    .filter((tournament) => tournament.matches.length > 0);
 
   const toggleTournament = (tournamentId: number, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -121,27 +75,45 @@ const Tourner: React.FC = () => {
 
   const handleOddClick = (
     match: Match,
-    team: "team1" | "team2",
+    team: "team_1" | "team_2",
     e: React.MouseEvent
   ) => {
     e.stopPropagation();
-    const selectedTeam = team === "team1" ? match.team_1 : match.team_2;
+    const selectedTeam = team === "team_1" ? match.team_1 : match.team_2;
+    if (!selectedTeam) return;
+
     setSelectedMatch(match);
     setSelectedOdd({
-      team: selectedTeam.name,
-      value: selectedTeam.coefficient,
+      team: selectedTeam.id,
+      teamName: selectedTeam.name,
+      value: parseFloat(
+        team === "team_1"
+          ? match.team_1_coefficient.toString()
+          : match.team_2_coefficient.toString()
+      ),
     });
   };
-
-  const placeBet = () => {
-    if (!selectedMatch || !selectedOdd || betAmount <= 0) {
+  const placeBet = async () => {
+    if (!selectedMatch || !selectedOdd || betAmount <= 0 || !user) {
       console.error("Invalid bet data:", {
         selectedMatch,
         selectedOdd,
         betAmount,
+        user,
       });
       return;
     }
+
+    await createBet(
+      {
+        userId: user.id,
+        team: selectedOdd.team,
+        amount: betAmount,
+      },
+      selectedMatch.id
+    );
+
+    await fetchUser(user.id);
 
     alert(
       `Ставка принята: ${selectedOdd.team} (коэф. ${selectedOdd.value}) на сумму ${betAmount}`
@@ -149,16 +121,17 @@ const Tourner: React.FC = () => {
     setSelectedMatch(null);
     setSelectedOdd(null);
   };
+
   if (loading) return <div className="text-center py-4">Загрузка...</div>;
   if (error)
     return <div className="text-center py-4 text-red-500">{error}</div>;
-  if (data.length === 0 || data.every((t) => t.matches.length === 0))
+  if (groupedMatches.length === 0)
     return <div className="text-center py-4">Нет доступных матчей</div>;
 
   return (
     <section className="mt-4 flex flex-col gap-4">
       <p className="font-bold text-[20px]">Турниры</p>
-      {data.map((item) => (
+      {groupedMatches.map((item) => (
         <div key={item.id} className="tourner rounded-xl cursor-pointer p-2">
           <div
             className="flex items-center justify-between"
@@ -196,13 +169,17 @@ const Tourner: React.FC = () => {
                       className="match h-28 flex items-center justify-between p-4 rounded-xl"
                     >
                       <div className="flex flex-col items-center flex-1">
-                        <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                        <img
+                          className="w-8 h-8 object-inherit"
+                          src={baseUrl + "/" + (match.team_1?.icon_path || "")}
+                          alt=""
+                        />
                         <p className="text-[14px] text-center mt-2">
                           {match.team_1?.name || "Team 1"}
                         </p>
                         <button
                           className="text-xs bg-[#10b981] text-white px-3 py-1 rounded-md mt-1 hover:bg-[#0d9e6e] transition-colors"
-                          onClick={(e) => handleOddClick(match, "team1", e)}
+                          onClick={(e) => handleOddClick(match, "team_1", e)}
                         >
                           {Number(match.team_1_coefficient).toFixed(2) ||
                             "1.00"}
@@ -215,13 +192,17 @@ const Tourner: React.FC = () => {
                       </div>
 
                       <div className="flex flex-col items-center flex-1">
-                        <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                        <img
+                          className="w-8 h-8 object-inherit"
+                          src={baseUrl + "/" + (match.team_2?.icon_path || "")}
+                          alt=""
+                        />
                         <p className="text-[14px] text-center mt-2">
                           {match.team_2?.name || "Team 2"}
                         </p>
                         <button
                           className="text-xs bg-[#10b981] text-white px-3 py-1 rounded-md mt-1 hover:bg-[#0d9e6e] transition-colors"
-                          onClick={(e) => handleOddClick(match, "team2", e)}
+                          onClick={(e) => handleOddClick(match, "team_2", e)}
                         >
                           {Number(match.team_2_coefficient).toFixed(2) ||
                             "1.00"}

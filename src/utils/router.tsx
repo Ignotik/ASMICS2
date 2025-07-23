@@ -1,3 +1,4 @@
+import AdminPanel from "../pages/AdminPanelPage";
 import AllTourner from "../pages/AllTourner";
 import Bonus from "../pages/Bonus";
 import Cards from "../pages/Cards";
@@ -42,5 +43,9 @@ export const routes = [
   {
     path: "/open-pack/:caseId",
     element: <OpenPackPage />,
+  },
+  {
+    path: "/admin",
+    element: <AdminPanel />,
   },
 ];

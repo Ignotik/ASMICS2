@@ -1,125 +1,101 @@
-import React, { useState, useEffect } from "react";
-
-interface BonusDay {
-  day: number;
-  taken: boolean;
-  collected: boolean;
-  reward: number;
-}
-
-const initialData: BonusDay[] = [
-  { day: 1, taken: false, collected: false, reward: 10 },
-  { day: 2, taken: false, collected: false, reward: 20 },
-  { day: 3, taken: false, collected: false, reward: 30 },
-  { day: 4, taken: false, collected: false, reward: 40 },
-  { day: 5, taken: false, collected: false, reward: 50 },
-  { day: 6, taken: false, collected: false, reward: 60 },
-  { day: 7, taken: false, collected: false, reward: 100 },
-];
+// components/BonusComponent.tsx
+import React from "react";
+import { useBonusStore } from "../../utils/store/BonusStore";
+import { useUserStore } from "../../utils/store/UserStore";
 
 const BonusComponent: React.FC = () => {
-  const [bonusDays, setBonusDays] = useState<BonusDay[]>(() => {
-    const saved = localStorage.getItem("dailyBonus");
-    return saved ? JSON.parse(saved) : initialData;
-  });
-  const [lastCollectionDate, setLastCollectionDate] = useState<string | null>(
-    localStorage.getItem("lastCollectionDate")
-  );
-  const [currentDay, setCurrentDay] = useState<number>(0);
-  const reg = true;
+  const { user } = useUserStore();
+  const {
+    bonusDays,
+    lastCollectionDate,
+    welcomeBonusClaimed,
+    currentStreak,
+    isLoading,
+    error,
+    claimDailyBonus,
+  } = useBonusStore();
 
-  // Объявляем today в начале компонента
-  const today = new Date().toDateString();
-
-  useEffect(() => {
-    if (lastCollectionDate !== today) {
-      const nextDay = lastCollectionDate ? (currentDay % 7) + 1 : 1;
-
-      setCurrentDay(nextDay);
-
-      setBonusDays((prev) =>
-        prev.map((day) =>
-          day.day === nextDay ? { ...day, taken: true, collected: false } : day
-        )
-      );
+  const handleDailyBonus = async () => {
+    try {
+      if (user) {
+        await claimDailyBonus(user.id);
+        alert(
+          `You've claimed your daily bonus! Current streak: ${
+            currentStreak + 1
+          }`
+        );
+      }
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to claim bonus");
     }
-  }, [lastCollectionDate, currentDay, today]);
-
-  useEffect(() => {
-    localStorage.setItem("dailyBonus", JSON.stringify(bonusDays));
-  }, [bonusDays]);
-
-  const collectBonus = () => {
-    const reward = bonusDays.find((day) => day.day === currentDay)?.reward || 0;
-
-    setBonusDays((prev) =>
-      prev.map((day) =>
-        day.day === currentDay ? { ...day, collected: true } : day
-      )
-    );
-
-    setLastCollectionDate(today);
-    localStorage.setItem("lastCollectionDate", today);
-
-    alert(`Вы получили ${reward} бонусов!`);
   };
 
-  const canCollectToday = () => {
+  const canClaimDailyBonus = () => {
+    if (!lastCollectionDate) return true;
+    const lastDate = new Date(lastCollectionDate);
+    const today = new Date();
     return (
-      lastCollectionDate !== today &&
-      bonusDays.some(
-        (day) => day.day === currentDay && day.taken && !day.collected
-      )
+      today.getDate() !== lastDate.getDate() ||
+      today.getMonth() !== lastDate.getMonth() ||
+      today.getFullYear() !== lastDate.getFullYear()
     );
   };
+
+  const currentDayIndex = currentStreak % 7;
 
   return (
     <section className="flex flex-col gap-2">
       <h2 className="text-xl font-bold">Бонусы</h2>
+
+      {error && <div className="text-red-500">{error}</div>}
+
       <article className="bg-[#0ea5e9] rounded-xl p-4 flex flex-col">
         <h2 className="font-bold text-black mb-4">Ежедневный бонус</h2>
         <div className="flex items-center justify-between gap-2">
-          {bonusDays.map((item) => (
+          {bonusDays.map((item, index) => (
             <div
               key={item.day}
               className={`w-12 h-12 rounded-[5px] flex flex-col items-center justify-center text-white
                 ${
                   item.collected
                     ? "bg-green-500"
-                    : item.taken
+                    : index === currentDayIndex && canClaimDailyBonus()
                     ? "bg-yellow-500"
                     : "bg-gray-500"
                 }`}
             >
               <span className="text-sm">{item.day}</span>
+              <span className="text-xs">5000</span>
             </div>
           ))}
         </div>
         <button
-          onClick={collectBonus}
-          disabled={!canCollectToday()}
+          onClick={handleDailyBonus}
+          disabled={!canClaimDailyBonus() || isLoading}
           className={`mt-4 rounded py-2 px-4 font-bold
             ${
-              canCollectToday()
+              canClaimDailyBonus()
                 ? "bg-[#f97316] hover:bg-orange-600 cursor-pointer"
                 : "bg-gray-400 cursor-not-allowed"
             }`}
         >
-          {canCollectToday()
-            ? `Забрать ${
-                bonusDays.find((day) => day.day === currentDay)?.reward
-              } монет`
-            : "Уже получено"}
+          {isLoading
+            ? "Loading..."
+            : canClaimDailyBonus()
+            ? `Claim ${bonusDays[currentDayIndex]?.reward} coins`
+            : "Already claimed"}
         </button>
+        <div className="mt-2 text-sm">Current streak: {currentStreak} days</div>
       </article>
+
       <article className="bg-[#0ea5e9] rounded-xl p-4 flex flex-col">
         <h2 className="font-bold text-black">Приветственный бонус</h2>
-        <p>
+        <p className="mb-2">
           Получите 10,000 монет в качестве приветственного бонуса! Доступен
-          только один раз .
+          только один раз.
         </p>
-        <button></button>
       </article>
+
       <article className="bg-[#0ea5e9] rounded-xl p-4 gap-2 flex flex-col">
         <h2 className="font-bold text-black">Активные бонусы</h2>
         <div className="flex p-2 bg-[#075985] justify-between items-center rounded-xl">
@@ -130,16 +106,18 @@ const BonusComponent: React.FC = () => {
             </p>
           </div>
           <p className="text-black text-[15px]">
-            {reg ? "Активирован" : "Не активирован"}
+            {welcomeBonusClaimed ? "Claimed" : "Not claimed"}
           </p>
         </div>
         <div className="flex p-2 bg-[#075985] justify-between items-center rounded-xl">
           <div className="flex flex-col">
             <p className="text-black text-[15px]">Ежедневный бонус</p>
-            <p className="text-black text-[12px]">+5000 каждый день</p>
+            <p className="text-black text-[12px]">
+              Current streak: {currentStreak} days
+            </p>
           </div>
           <p className="text-black text-[15px]">
-            {lastCollectionDate === today ? "Активирован" : "Не активирован"}
+            {canClaimDailyBonus() ? "Available" : "Claimed today"}
           </p>
         </div>
       </article>

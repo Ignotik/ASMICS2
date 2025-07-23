@@ -4,6 +4,7 @@ import "./BurgerMenu.css";
 import logo from "../../assets/FEFEFE.png";
 import { menuItems } from "../../utils/consts/burger";
 import { Link } from "react-router-dom";
+import { useUserStore } from "../../utils/store/UserStore";
 
 interface BurgerMenuProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -11,11 +12,17 @@ interface BurgerMenuProps {
 }
 
 const BurgerMenu: React.FC<BurgerMenuProps> = ({ setIsOpen, isOpen }) => {
+  const { user } = useUserStore();
   const groupedItems = menuItems.reduce((acc, item) => {
-    if (!acc[item.section]) {
-      acc[item.section] = [];
+    const hasAccess =
+      item.access === "all" || (user && item.access.includes(user.role));
+
+    if (hasAccess) {
+      if (!acc[item.section]) {
+        acc[item.section] = [];
+      }
+      acc[item.section].push(item);
     }
-    acc[item.section].push(item);
     return acc;
   }, {} as Record<string, typeof menuItems>);
 

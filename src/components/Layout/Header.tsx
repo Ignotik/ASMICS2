@@ -3,9 +3,11 @@ import { HiOutlineGift } from "react-icons/hi";
 import { FaRegBell } from "react-icons/fa";
 import { CiBitcoin } from "react-icons/ci";
 import BurgerMenu from "../BurgerMenu/BurgerMenu";
+import { useUserStore } from "../../utils/store/UserStore";
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useUserStore();
 
   return (
     <>
@@ -36,7 +38,7 @@ const Header: React.FC = () => {
             <HiOutlineGift color="#f39404" size={30} />
             <FaRegBell color="#f39404" size={30} />
             <div className="flex items-center gap-1">
-              0
+              <p>{user?.balance}</p>
               <CiBitcoin color="#f39404" size={40} />
             </div>
           </div>

@@ -1,15 +1,15 @@
 import React from "react";
-import type { Team } from "../Tourners/Tourner";
+import { baseUrl } from "../../utils/consts/url-backend";
+import type { Match } from "../../utils/types/tournament";
 
 type DoBetProps = {
-  selectedMatch: {
-    team_1: Team;
-    team_2: Team;
-  };
+  selectedMatch: Match | null;
   selectedOdd: {
-    team: string;
+    team: number;
     value: number;
+    teamName: string;
   };
+
   betAmount: number;
   setBetAmount: (amount: number) => void;
 };
@@ -35,17 +35,20 @@ const DoBetMain: React.FC<DoBetProps> = ({
     setBetAmount(value === "" ? 0 : Number(value));
   };
 
+  if (!selectedMatch || !selectedOdd) {
+    return null;
+  }
+
   return (
     <>
       <h3 className="text-xl font-bold mb-4 border-b-2 pb-4">Сделать ставку</h3>
       <div className="mb-6 flex justify-between items-center px-4">
-        {/* Команда 1 */}
         <div className="flex flex-col items-center w-1/3">
           <div className="w-16 h-16 mb-2 flex items-center justify-center">
-            {selectedMatch.team_1.icon_path ? (
+            {selectedMatch.team_1?.icon_path ? (
               <img
                 className="max-h-full max-w-full object-contain"
-                src={selectedMatch.team_1.icon_path}
+                src={baseUrl + "/" + selectedMatch.team_1.icon_path}
                 alt={selectedMatch.team_1.name}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
@@ -55,31 +58,28 @@ const DoBetMain: React.FC<DoBetProps> = ({
             ) : (
               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
                 <span className="text-xs text-center">
-                  {selectedMatch.team_1.name}
+                  {selectedMatch.team_1?.name}
                 </span>
               </div>
             )}
           </div>
           <p className="font-medium text-center text-sm md:text-base">
-            {selectedMatch.team_1.name}
+            {selectedMatch.team_1?.name}
           </p>
         </div>
 
-        {/* Время матча */}
-        {/* <div className="flex flex-col items-center mx-2 w-1/3">
+        <div className="flex flex-col items-center mx-2 w-1/3">
           <div className="text-xs text-gray-300 mb-1">Матч</div>
           <div className="bg-[#0ea5e9] text-white text-xs px-2 py-1 rounded-md">
-            {selectedMatch.time}
+            {new Date(selectedMatch.started_at).toLocaleString()}
           </div>
-        </div> */}
-
-        {/* Команда 2 */}
+        </div>
         <div className="flex flex-col items-center w-1/3">
           <div className="w-16 h-16 mb-2 flex items-center justify-center">
-            {selectedMatch.team_2.icon_path ? (
+            {selectedMatch.team_2?.icon_path ? (
               <img
                 className="max-h-full max-w-full object-contain"
-                src={selectedMatch.team_2.icon_path}
+                src={baseUrl + "/" + selectedMatch.team_2.icon_path}
                 alt={selectedMatch.team_2.name}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
@@ -89,20 +89,22 @@ const DoBetMain: React.FC<DoBetProps> = ({
             ) : (
               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
                 <span className="text-xs text-center">
-                  {selectedMatch.team_2.name}
+                  {selectedMatch.team_2?.name}
                 </span>
               </div>
             )}
           </div>
           <p className="font-medium text-center text-sm md:text-base">
-            {selectedMatch.team_2.name}
+            {selectedMatch.team_2?.name}
           </p>
         </div>
       </div>
 
       <div className="bg-[#0ea5e9] bg-opacity-20 p-3 rounded-lg mb-4">
-        <p className="font-bold">Вы выбрали: {selectedOdd.team}</p>
-        <p className="font-bold">Коэффициент: {selectedOdd.value.toFixed(2)}</p>
+        <p className="font-bold">Вы выбрали: {selectedOdd.teamName}</p>
+        <p className="font-bold">
+          Коэффициент: {Number(selectedOdd.value).toFixed(2)}
+        </p>
       </div>
 
       <div className="mb-4">
@@ -144,7 +146,7 @@ const DoBetMain: React.FC<DoBetProps> = ({
         <p>
           Возможный выигрыш:{" "}
           <span className="font-bold">
-            {(betAmount * selectedOdd.value).toFixed(2)}
+            {(Number(betAmount) * Number(selectedOdd.value)).toFixed(2)}
           </span>
         </p>
       </div>
